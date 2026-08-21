@@ -1,56 +1,92 @@
-<!-- Description -->
+# HelloID-Conn-SA-Full-Exchange-On-Premises-Mailcontact-Delete
+
+| :information_source: Information                                                                                                                                                                                                                                                                                                                                                          |
+| :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| This repository contains the connector and configuration code only. The implementer is responsible for acquiring the connection details such as username, password, certificate, etc. You might even need to sign a contract or agreement with the supplier before implementing this connector. Please contact the client's application manager to coordinate the connector requirements. |
+
 ## Description
-This HelloID Service Automation Delegated Form provides the functionality to delete a mail contact.
 
- 1. Enter a name to lookup the mail contact which needs to be deleted.
- 2. The result will show you a list of matching mail contacts. You will need select to correct one
- 3. From the available mail contacts, select the one to delete.
+_HelloID-Conn-SA-Full-Exchange-On-Premises-Mailcontact-Delete_ is a template designed for use with HelloID Service Automation (SA) Delegated Forms. It can be imported into HelloID and customized according to your requirements.
 
-## Versioning
-| Version | Description | Date |
-| - | - | - |
-| 1.0.0   | Initial release | 2023/08/18  |
+This delegated form provides functionality to delete Exchange On-Premises mail contacts. The following workflow is available:
 
-<!-- TABLE OF CONTENTS -->
-## Table of Contents
-* [Description](#description)
-* [All-in-one PowerShell setup script](#all-in-one-powershell-setup-script)
-  * [Getting started](#getting-started)
-* [Post-setup configuration](#post-setup-configuration)
-* [Manual resources](#manual-resources)
+1.  Search for mail contacts by entering a search term (name, alias, or email address)
+2.  Select the mail contact to delete from the search results grid
+3.  The selected mail contact is validated and retrieved from Exchange
+4.  The mail contact is permanently deleted from Exchange On-Premises
+5.  All actions are logged to HelloID audit logs with detailed information
 
+## Getting started
 
-## All-in-one PowerShell setup script
-The PowerShell script "createform.ps1" contains a complete PowerShell script using the HelloID API to create the complete Form including user defined variables, tasks and data sources.
+### Requirements
 
- _Please note that this script asumes none of the required resources do exists within HelloID. The script does not contain versioning or source control_
+- **Exchange On-Premises Environment**:<br>
+  A working Exchange On-Premises environment with remote PowerShell access enabled. The connector uses remote PowerShell sessions to connect to Exchange.
+- **HelloID Service Automation Agent** (if not using cloud execution):<br>
+  A HelloID Service Automation agent must be installed and configured if the tasks are not set to run in the cloud. The agent must have network access to the Exchange server.
+- **PowerShell Remoting**:<br>
+  PowerShell remoting must be enabled on the Exchange server. The connection URI should be accessible from the HelloID agent or cloud environment.
 
+### Connection settings
 
-### Getting started
-Please follow the documentation steps on [HelloID Docs](https://docs.helloid.com/hc/en-us/articles/360017556559-Service-automation-GitHub-resources) in order to setup and run the All-in one Powershell Script in your own environment.
+The following user-defined variables are used by the connector.
 
+| Setting               | Description                                               | Mandatory |
+| --------------------- | --------------------------------------------------------- | --------- |
+| ExchangeConnectionUri | The URI to the Exchange PowerShell endpoint               | Yes       |
+| ExchangeAdminUsername | The username of an account with Exchange admin privileges | Yes       |
+| ExchangeAdminPassword | The password of the Exchange admin account                | Yes       |
 
-## Post-setup configuration
-After the all-in-one PowerShell script has run and created all the required resources. The following items need to be configured according to your own environment
- 1. Update the following [user defined variables](https://docs.helloid.com/hc/en-us/articles/360014169933-How-to-Create-and-Manage-User-Defined-Variables)
-<table>
-  <tr><td><strong>Variable name</strong></td><td><strong>Example value</strong></td><td><strong>Description</strong></td></tr>
-  <tr><td>ExchangeConnectionUri</td><td>https://servername/powershell</td><td>Exchange server URI</td></tr>
-  <tr><td>ExchangeAdminUsername</td><td>username@domain.com</td><td>Exchange server admin account</td></tr>
-  <tr><td>ExchangeAdminPassword</td><td>********</td><td>Exchange server admin password</td></tr>
-</table>
+## Remarks
 
-## Manual resources
-This Delegated Form uses the following resources in order to run
+### Server-Side Filtering for Performance
 
-### Powershell data source '[powershell-datasource]_Exchange-mailcontact-delete-generate-table-wildcard'
-This Powershell data source runs a query to search for the mail contact.
+- **Filter Parameter**: The datasource uses the `-Filter` parameter with `Get-Recipient` to perform server-side filtering. This significantly improves performance when searching through large mail contact collections by reducing the amount of data transferred over the network.
 
-### Powershell data source '[task]_Exchange on-premise - Delete Mailcontact'
-This delegated form task deletes the mail contact.
+### Authentication Method
+
+- **Default Authentication**: The connector uses `Default` authentication which allows for flexible authentication methods including NTLM and Kerberos. This provides broader compatibility across different Exchange environments compared to specifying a single authentication method.
+
+### Session Security Options
+
+- **Certificate Validation Enabled**: The connector has certificate validation enabled (`SkipCACheck`, `SkipCNCheck`, and `SkipRevocationCheck` are all set to `$false`). This ensures secure connections to Exchange servers. If you encounter certificate-related connection issues, verify that your Exchange server has a valid SSL certificate.
+
+### Resource Cleanup
+
+- **Guaranteed Session Cleanup**: The connector uses a `finally` block to ensure that Exchange PowerShell sessions are always cleaned up, even if errors occur during execution. This prevents resource leaks and session exhaustion.
+
+### Wildcard Search Support
+
+- **Flexible Search**: The search functionality supports wildcard matching across multiple attributes (Name, Alias, PrimarySmtpAddress). When a user enters a search term, it's automatically wrapped with wildcards to find partial matches.
+
+### Error Handling and Logging
+
+- **Detailed Audit Logs**: All operations including connection, deletion, and disconnection are logged to HelloID audit logs with detailed information including the action performed, target display name, and target identifier.
+- **Contextual Error Messages**: Error messages include script line numbers and context to aid in troubleshooting.
+
+## Development resources
+
+### PowerShell cmdlets
+
+The following Exchange PowerShell cmdlets are used by the connector:
+
+| Cmdlet             | Description                                      |
+| ------------------ | ------------------------------------------------ |
+| Get-Recipient      | Retrieves mail contact information from Exchange |
+| Remove-MailContact | Deletes a mail contact from Exchange             |
+
+### API documentation
+
+- [Exchange Server PowerShell Documentation](https://learn.microsoft.com/en-us/powershell/exchange/exchange-management-shell)
+- [Connect to Exchange Servers using Remote PowerShell](https://learn.microsoft.com/en-us/powershell/exchange/connect-to-exchange-servers-using-remote-powershell)
+- [Get-Recipient Cmdlet](https://learn.microsoft.com/en-us/powershell/module/exchange/get-recipient)
+- [Remove-MailContact Cmdlet](https://learn.microsoft.com/en-us/powershell/module/exchange/remove-mailcontact)
 
 ## Getting help
-_If you need help, feel free to ask questions on our [TODO-forum](https://forum.helloid.com/forum/helloid-connectors/service-automation/0000-helloid-sa-exchange-on-premises-delete-mailcontact)_
 
-## HelloID Docs
+> :bulb: **Tip:**  
+> _For more information on Delegated Forms, please refer to our [documentation](https://docs.helloid.com/en/service-automation/delegated-forms.html) pages_.
+
+## HelloID docs
+
 The official HelloID documentation can be found at: https://docs.helloid.com/

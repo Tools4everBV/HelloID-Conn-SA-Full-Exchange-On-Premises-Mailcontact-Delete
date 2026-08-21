@@ -5,7 +5,7 @@
                        {
                            "key":  "searchcontact",
                            "templateOptions":  {
-                                                   "label":  "Search"
+                                                   "label":  "Search Mailcontact"
                                                },
                            "type":  "input",
                            "summaryVisibility":  "Show",
@@ -25,28 +25,20 @@
                                                                                     "field":  "DisplayName"
                                                                                 },
                                                                                 {
-                                                                                    "headerName":  "Emailaddress",
-                                                                                    "field":  "Emailaddress"
+                                                                                    "headerName":  "Primary Smtp Address",
+                                                                                    "field":  "PrimarySmtpAddress"
                                                                                 },
                                                                                 {
-                                                                                    "headerName":  "Alias",
-                                                                                    "field":  "Alias"
+                                                                                    "headerName":  "Distinguished Name",
+                                                                                    "field":  "DistinguishedName"
                                                                                 },
                                                                                 {
-                                                                                    "headerName":  "First Name",
-                                                                                    "field":  "FirstName"
+                                                                                    "headerName":  "Recipient Type Details",
+                                                                                    "field":  "RecipientTypeDetails"
                                                                                 },
                                                                                 {
-                                                                                    "headerName":  "Initials",
-                                                                                    "field":  "Initials"
-                                                                                },
-                                                                                {
-                                                                                    "headerName":  "Last Name",
-                                                                                    "field":  "LastName"
-                                                                                },
-                                                                                {
-                                                                                    "headerName":  "DN",
-                                                                                    "field":  "DN"
+                                                                                    "headerName":  "Hidden From Address Lists Enabled",
+                                                                                    "field":  "HiddenFromAddressListsEnabled"
                                                                                 }
                                                                             ],
                                                                 "height":  300,
@@ -67,7 +59,8 @@
                                                                         },
                                                    "useFilter":  true,
                                                    "useDefault":  false,
-                                                   "searchPlaceHolder":  "Search this data"
+                                                   "searchPlaceHolder":  "Search this data",
+                                                   "allowCsvDownload":  true
                                                },
                            "type":  "grid",
                            "summaryVisibility":  "Show",
